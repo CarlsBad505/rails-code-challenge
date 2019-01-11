@@ -48,3 +48,16 @@ Well, we know that route helpers end with the word *path*. So the problem with t
 <%= @orders.each do |order| %>
 ```
 In ERB, we don't want to use the equal sign `<%=`, but instead we want just `<%`. The equal sign signifies that we should display that output in the view, but in this case we don't need to display the instance variable that we're looping through.
+
+**3. Sort the orders into 2 categories on the index page - shipped and not shipped.  Sort the shipped orders by shipped date.**
+In the `orders_controller.rb`, we can add two new instance variables to account for the two categories that we want to display, while simultaneously removing the old instance variable because its no longer necessary. The first instance variable looks like the following:
+```
+@orders_shipped = Order.where.not(shipped_at: nil).order(:shipped_at)
+```
+Lets break down this query in a SQL perspective to understand what active record is doing. We `SELECT` records `FROM` orders `WHERE` shipped_at `IS NOT NULL` and `ORDER BY` shipped_at. We don't need to explicitly call `ASC` on the `.order` query, because that is the default. Next, lets break down the second category:
+```
+@orders_not_shipped = Order.where(shipped_at: nil)
+```
+This is similar to the first query, lets break it down in a SQL perspective. We `SELECT` records `FROM` orders `WHERE` shipped_at `IS NULL`. Now by assigning two new instance variables to the two queries, we can easily use their respective collections to portray the data via the index page. 
+
+The view has some room for refactoring. We don't need to explicitly use `<html>`, `<body>`, `head` html selectors because rails already defines these in the `application.html.erb` file and propagates this information downward using the `<%= yield %>` statement in its body. Furthermore, the original code attempts to define the `title` as "Orders". This won't work because the `title` in `application.html.erb` is already defining it as a static string. Instead, we can build a helper (please see file `application_helper.rb`) that will dynamically change the title for us, by utilizing `provide` method. Finally, the structure of how the data is displayed is rather simple and not very visually appealing. I imported bootstrap and material design gems to help build a table in a grid system.
