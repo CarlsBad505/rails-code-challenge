@@ -8,6 +8,7 @@
           <tr>
             <th scope="col">Order #</th>
             <th scope="col">Shipped Date</th>
+            <th scope="col">Expedite</th>
           </tr>
         </thead>
         <tbody>
@@ -15,6 +16,7 @@
             <tr>
               <td><%= link_to order.id, order_path(order) %></td>
               <td><%= order.shipped_at %></td>
+              <td><%= order.expedite ? 'yes' : 'no' %></td>
             </tr>
           <% end %>
         </tbody>
@@ -28,6 +30,7 @@
           <tr>
             <th scope="col">Order #</th>
             <th scope="col">Shipped Date</th>
+            <th scope="col">Expedite</th>
           </tr>
         </thead>
         <tbody>
@@ -35,10 +38,15 @@
             <tr>
               <td><%= link_to order.id, order_path(order) %></td>
               <td><%= order.shipped_at.nil? ? "n/a" : order.shipped_at %></td>
+              <td><%= order.expedite ? 'yes' : 'no' %></td>
             </tr>
           <% end %>
         </tbody>
       </table>
     </div>
+  </div>
+
+  <div class="row">
+    <h3 class="col"><%= link_to "+ New Order", new_order_path, {class: 'btn btn-primary'} %></h3>
   </div>
 </div>

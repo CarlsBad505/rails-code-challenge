@@ -1,0 +1,50 @@
+<%= provide(:page_title, 'New Order') %>
+<div class="container">
+  <div class="row">
+    <h2>Create New Order</h2>
+    <hr>
+  </div>
+  <br>
+  <div class="row" id="create-order">
+    <%= form_for @order do |f| %>
+      <div class="form-group">
+        <%= f.label :shipped_at %>
+        <%= f.date_field :shipped_at, class: 'form-control' %>
+      </div>
+      <div class="form-group">
+        <%= f.label :expedite %>
+        <%= f.check_box :expedite %>
+      </div>
+
+      <%= f.fields_for :line_items do |li_f| %>
+        <div class="row">
+          <div class="form-group col-6">
+            <%= li_f.label :widget %>
+            <%= li_f.collection_select :widget_id, @widgets, :id, :name_with_msrp, {include_blank: true}, {class: 'form-control', id: 'widget-choice', required: true} %>
+          </div>
+          <div class="form-group col-6">
+            <%= li_f.label :quantity %>
+            <%= li_f.number_field :quantity, min: 1, value: 1, class: 'form-control' %>
+          </div>
+          <div class="form-group col">
+            <%= li_f.hidden_field :unit_price, class: 'form-control', id: 'unit-price' %>
+          </div>
+        </div>
+      <% end %>
+      <%= link_to "<- View Orders", orders_path, {class: 'btn btn-success'} %>
+      <%= f.submit "Create", class: 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<script type="text/javascript">
+  let widgets = {};
+  $.get('/widgets', function(data) {
+    widgets = data;
+  });
+  $('#widget-choice').on('change', function() {
+    let id = $(this).val();
+    let msrp = widgets[id];
+    $('#unit-price').val(msrp);
+  })
+</script>

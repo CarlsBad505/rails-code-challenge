@@ -1,12 +1,12 @@
-<html>
-  <head>
-    <title>Order <%= @order.id %></title>
-  </head>
-  <body>
-    <h1>Order <%= @order.id %></h1>
+<%= provide(:page_title, "Order ##{@order.id}") %>
+<div class="container">
+  <h1>Order # <%= @order.id %></h1>
+  <p><b>Created:</b> <%= @order.created_at %></p>
+  <p><b>Shipped:</b> <%= @order.shipped_at.nil? ? 'n/a' : @order.shipped_at %></p>
+  <p><b>Expedite:</b> <%= @order.expedite ? 'yes' : 'no' %></p>
+  <% @order.line_items.each_with_index do |line_item, idx| %>
+    <p><b>Line #<%= idx + 1 %>:</b> <%= Widget.find(line_item.widget_id).name %> | $<%= line_item.unit_price %></p>
+  <% end %>
 
-    <p>Created <%= @order.created_at %></p>
-    <p>Shipped <%= @order.shipped_at %></p>
-    
-  </body>
-</html>
+  <h3><%= link_to "<- View Orders", orders_path, {class: 'btn btn-primary'} %></h3>
+</div>
