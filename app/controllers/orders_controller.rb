@@ -9,12 +9,9 @@ class OrdersController < ApplicationController
   end
 
   def new
-    # widgets_count = Widget.count
     @order = Order.new
     @widgets = Widget.order(:name)
-    # widgets_count.times do
-      @order.line_items.build
-    # end
+    @order.line_items.build
   end
 
   def create
