@@ -1,5 +1,5 @@
 class Order < ApplicationRecord
-  has_many :line_items, dependent: :destroy
+  has_many :line_items, inverse_of: :order, dependent: :destroy
   accepts_nested_attributes_for :line_items
 
   def expedited?
@@ -10,8 +10,8 @@ class Order < ApplicationRecord
     @returns
   end
 
-  def settings(opts = {expedite: nil})
-    @expedite = opts[:expedite].presence
+  def settings(opts = {})
+    @expedite = expedite?
     @returns = opts[:returns].presence
     @warehouse = opts[:warehouse].presence
   end

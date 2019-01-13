@@ -1,0 +1,14 @@
+<div class="row nested-fields">
+  <div class="form-group col-6">
+    <%= f.label :widget %>
+    <%= f.collection_select :widget_id, @widgets, :id, :name_with_msrp, {include_blank: true}, {class: 'form-control', id: 'widget-choice', required: true} %>
+  </div>
+  <div class="form-group col-6">
+    <%= f.label :quantity %>
+    <%= f.number_field :quantity, min: 1, value: 1, class: 'form-control' %>
+  </div>
+  <div class="form-group col">
+    <%= f.hidden_field :unit_price, class: 'form-control', id: 'unit-price' %>
+  </div>
+  <%= link_to_remove_association('remove this', f)%>
+</div>

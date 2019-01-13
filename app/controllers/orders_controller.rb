@@ -1,4 +1,5 @@
 class OrdersController < ApplicationController
+
   def index
     @orders_shipped = Order.where.not(shipped_at: nil).order(:shipped_at)
     @orders_not_shipped = Order.where(shipped_at: nil)
@@ -27,6 +28,6 @@ class OrdersController < ApplicationController
   private
 
   def order_params
-    params.require(:order).permit(:shipped_at, :expedite, line_items_attributes: [:id, :quantity, :unit_price, :widget_id])
+    params.require(:order).permit(:shipped_at, :expedite, line_items_attributes: [:id, :quantity, :unit_price, :widget_id, :_destroy])
   end
 end

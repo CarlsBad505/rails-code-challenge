@@ -5,7 +5,7 @@
   <p><b>Shipped:</b> <%= @order.shipped_at.nil? ? 'n/a' : @order.shipped_at %></p>
   <p><b>Expedite:</b> <%= @order.expedite ? 'yes' : 'no' %></p>
   <% @order.line_items.each_with_index do |line_item, idx| %>
-    <p><b>Line #<%= idx + 1 %>:</b> <%= Widget.find(line_item.widget_id).name %> | $<%= line_item.unit_price %></p>
+    <p><b>Line #<%= idx + 1 %>:</b> <%= Widget.find(line_item.widget_id).name %> | $<%= line_item.unit_price %> | QTY: <%= line_item.quantity %></p>
   <% end %>
 
   <h3><%= link_to "<- View Orders", orders_path, {class: 'btn btn-primary'} %></h3>

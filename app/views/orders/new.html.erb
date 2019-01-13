@@ -15,21 +15,9 @@
         <%= f.label :expedite %>
         <%= f.check_box :expedite %>
       </div>
-
+      <%= link_to_add_association 'Add Line Item', f, :line_items %>
       <%= f.fields_for :line_items do |li_f| %>
-        <div class="row">
-          <div class="form-group col-6">
-            <%= li_f.label :widget %>
-            <%= li_f.collection_select :widget_id, @widgets, :id, :name_with_msrp, {include_blank: true}, {class: 'form-control', id: 'widget-choice', required: true} %>
-          </div>
-          <div class="form-group col-6">
-            <%= li_f.label :quantity %>
-            <%= li_f.number_field :quantity, min: 1, value: 1, class: 'form-control' %>
-          </div>
-          <div class="form-group col">
-            <%= li_f.hidden_field :unit_price, class: 'form-control', id: 'unit-price' %>
-          </div>
-        </div>
+        <%= render 'line_item_fields', f: li_f %>
       <% end %>
       <%= link_to "<- View Orders", orders_path, {class: 'btn btn-success'} %>
       <%= f.submit "Create", class: 'btn btn-primary' %>
@@ -38,13 +26,32 @@
 </div>
 
 <script type="text/javascript">
-  let widgets = {};
-  $.get('/widgets', function(data) {
-    widgets = data;
-  });
-  $('#widget-choice').on('change', function() {
-    let id = $(this).val();
-    let msrp = widgets[id];
-    $('#unit-price').val(msrp);
-  })
+  const updateUnitPriceFunc = function (lineItem) {
+    const widgetChoice = $(lineItem).find('select');
+    $(widgetChoice).on('change', function () {
+      let id = $(this).val();
+      const hiddenInput = $(lineItem).find('input[type="hidden"]:not([name="authenticity_token"])');
+      $(hiddenInput).val(widgets[id]);
+    })
+  };
+
+  const widgets = {};
+
+  <% @widgets.each do |widget| %>
+    widgets[<%= widget.id %>] = <%= widget.msrp %>;
+    <% end %>
+
+    $('a.add_fields')
+      .data('association-insertion-method', 'after')
+      .data('association-insertion-node', 'this');
+
+      $('#new_order')
+        .on('cocoon:after-insert', function (e, lineItem) {
+          updateUnitPriceFunc(lineItem);
+        })
+        .on('cocoon:before-remove', function (e, lineItem) {
+          $(lineItem).find('select').off('change');
+        });
+
+    updateUnitPriceFunc($('form .row.nested-fields'));
 </script>
