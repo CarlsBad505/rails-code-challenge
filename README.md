@@ -67,15 +67,25 @@ We first create a button on the index page using a `link_to` rails helper that t
 ```
 accepts_nested_attributes_for :line_items
 ```
-In the orders controller, we set up the the necessary instance variables for the view in both the `new` and `create` methods to prepare the form. At the same time, we also want to follow rails conventions with strong params and nested attributes within like so:
+In the orders controller, we set up the the necessary instance variables for the view in both the `new` and `create` methods to prepare the form and the view. At the same time, we also want to follow rails conventions with strong params and nested attributes within like so:
 ```
 private
 
 def order_params
-  params.require(:order).permit(:shipped_at, :expedite, line_items_attributes: [:id, :quantity, :unit_price, :widget_id])
+  params.require(:order).permit(:shipped_at, :expedite, line_items_attributes: [:id, :quantity, :unit_price, :widget_id, :_destroy])
 end
 ```
-In the form itself, we can utilize `<%= f.fields_for :line_items do |li_f| %>` as a nested form for line_items. The trick here is that the attribute `unit_price` should be the same thing as the widget's msrp. Doesn't make a lot of sense in the real world for a user to input their own unit_price. Theoretically, because a line_item also belongs to a widget, we can assume that the unit_price is the same thing as the associated widget's msrp in this example. We can achieve this with a little javascript snippet that I spun up in the page. The snippet receives a list of widgets as a hash from a simple `GET` endpoint that I built. It then listens to any change that occurs when the user chooses a widget from the drop down menu and subsequently populates that line item's unit_price with the chosen widget's msrp.
+In the form itself, we can utilize `<%= f.fields_for :line_items do |li_f| %>` as a nested form for line_items. The trick here is that the attribute `unit_price` should be the same thing as the widget's msrp. Doesn't make a lot of sense in the real world for a user to input their own unit_price. Theoretically, because a line_item also belongs to a widget, we can assume that the unit_price is the same thing as the associated widget's msrp in this example. We can achieve this with a little javascript snippet that I spun up in the page. The snippet uses some erb with javascript to assemble a hash of widgets and their relative msrps:
+```
+const widgets = {};
+<% @widgets.each do |widget| %>
+  widgets[<%= widget.id %>] = <%= widget.msrp %>;
+<% end %>
+```
+Now I can populate a hidden field for the `unit_price` as soon as the user selects a widget from the dropdown. Furthermore, I used a gem called cocoon to help spin up new line items on the fly by onclick event. If a user needs to add more line items, they can do so on the fly. Subsequently, they can also delete the line item if they deem it is no longer necessary. Also in the javascript snippet, are `change` event functions that are listening and waiting to populate the additional new line items with a `unit_price`. On successful submission, they are taken to a `show` page for the order that was just created.
 
 **5. The expedited flag on an order can't be disabled once it's been enabled. Find and fix the bug.**
-The main problem here is that nothing is being instantiated or saved to the database when one attempts to flip the `expedite` attribute on or off via an Order. Upon calling the instance method `setting` on an order, the method builds a hash on the fly and determines the `presence` of a key. This is a problem because we're at the mercy of memory, which is not the best way to instantiate. Instead, we should save this attribute to the database, especially given it's potential importance in the real world. By doing so, we can still use the `expedited?` instance method to read the attribute (with a little refactoring) or just have it available on instances of an Order at all times. We accomplish this by generating a new migration, adding the expedite attribute to the schema as a boolean data type. Now we have access to this attribute in the form, when a user is attempting to create a new order.
+The main problem here is that nothing is being instantiated or saved to the database when one attempts to flip the `expedite` attribute on or off via an Order. Upon calling the instance method `setting` on an order, the method builds a hash on the fly and determines the `presence` of a key. This is a problem because we're at the mercy of memory, which is not the best way to instantiate. Furthermore, the `presence` method will return nil if the object in question is either empty of falsey. Instead, we should save this attribute to the database, especially given it's potential importance in the real world. By doing so, we can still use the `expedited?` instance method to read the attribute (with a little refactoring) or just have it available on instances of an Order at all times. We accomplish this by generating a new migration, adding the expedite attribute to the schema as a boolean data type. Now we have access to this attribute in the form, when a user is attempting to create a new order.
+
+**Specs**
+I added a few more specs throughout including `POST` of a new order in the orders controller!

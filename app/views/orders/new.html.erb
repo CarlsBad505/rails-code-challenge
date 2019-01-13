@@ -39,19 +39,19 @@
 
   <% @widgets.each do |widget| %>
     widgets[<%= widget.id %>] = <%= widget.msrp %>;
-    <% end %>
+  <% end %>
 
-    $('a.add_fields')
-      .data('association-insertion-method', 'after')
-      .data('association-insertion-node', 'this');
+  $('a.add_fields')
+    .data('association-insertion-method', 'after')
+    .data('association-insertion-node', 'this');
 
-      $('#new_order')
-        .on('cocoon:after-insert', function (e, lineItem) {
-          updateUnitPriceFunc(lineItem);
-        })
-        .on('cocoon:before-remove', function (e, lineItem) {
-          $(lineItem).find('select').off('change');
-        });
+  $('#new_order')
+    .on('cocoon:after-insert', function (e, lineItem) {
+      updateUnitPriceFunc(lineItem);
+    })
+    .on('cocoon:before-remove', function (e, lineItem) {
+      $(lineItem).find('select').off('change');
+    });
 
-    updateUnitPriceFunc($('form .row.nested-fields'));
+  updateUnitPriceFunc($('form .row.nested-fields'));
 </script>
